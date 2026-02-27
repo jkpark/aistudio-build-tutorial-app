@@ -3,7 +3,7 @@ import { Wand2, Upload, Image as ImageIcon, Loader2, Download } from 'lucide-rea
 import { generateImage, editImage } from '../services/geminiService';
 import { motion, AnimatePresence } from 'motion/react';
 
-export function StudioSection() {
+export function StudioSection({ apiKey }: { apiKey: string }) {
   const [mode, setMode] = useState<'generate' | 'edit'>('generate');
   const [prompt, setPrompt] = useState('');
   const [sourceImage, setSourceImage] = useState<{ data: string, mimeType: string } | null>(null);
@@ -34,16 +34,21 @@ export function StudioSection() {
   const handleSubmit = async () => {
     if (!prompt.trim()) return;
     
+    if (!apiKey) {
+      setError("Please enter your Gemini API Key at the top of the page.");
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     
     try {
       let result;
       if (mode === 'generate') {
-        result = await generateImage(prompt);
+        result = await generateImage(prompt, apiKey);
       } else {
         if (!sourceImage) throw new Error("Please upload a source image first");
-        result = await editImage(sourceImage.data, sourceImage.mimeType, prompt);
+        result = await editImage(sourceImage.data, sourceImage.mimeType, prompt, apiKey);
       }
       setResultImage(result);
     } catch (err: any) {

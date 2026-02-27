@@ -3,13 +3,18 @@ import { Play, Loader2, LayoutGrid } from 'lucide-react';
 import { generateImage } from '../services/geminiService';
 import { motion } from 'motion/react';
 
-export function StoryboardSection() {
+export function StoryboardSection({ apiKey }: { apiKey: string }) {
   const [frames, setFrames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("A cinematic commercial for a sleek new smartphone. Neon-lit cyberpunk city background.");
 
   const handleGenerate = async () => {
+    if (!apiKey) {
+      setError("Please enter your Gemini API Key at the top of the page.");
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     setFrames([]);
@@ -21,7 +26,7 @@ export function StoryboardSection() {
         `${prompt} - Scene 3: Action shot with dynamic lighting`
       ];
       
-      const results = await Promise.all(prompts.map(p => generateImage(p)));
+      const results = await Promise.all(prompts.map(p => generateImage(p, apiKey)));
       setFrames(results);
     } catch (err: any) {
       setError(err.message || "Failed to generate storyboard");

@@ -1,15 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 
-function getAiInstance() {
-  const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+function getAiInstance(apiKey: string) {
   if (!apiKey) {
-      console.error("API Key is not set");
+      throw new Error("API Key is required. Please enter it at the top of the page.");
   }
-  return new GoogleGenAI({ apiKey: apiKey as string });
+  return new GoogleGenAI({ apiKey });
 }
 
-export async function generateImage(prompt: string): Promise<string> {
-  const ai = getAiInstance();
+export async function generateImage(prompt: string, apiKey: string): Promise<string> {
+  const ai = getAiInstance(apiKey);
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
     contents: {
@@ -35,8 +34,8 @@ export async function generateImage(prompt: string): Promise<string> {
   throw new Error("Failed to generate image");
 }
 
-export async function editImage(base64Data: string, mimeType: string, prompt: string): Promise<string> {
-  const ai = getAiInstance();
+export async function editImage(base64Data: string, mimeType: string, prompt: string, apiKey: string): Promise<string> {
+  const ai = getAiInstance(apiKey);
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
     contents: {

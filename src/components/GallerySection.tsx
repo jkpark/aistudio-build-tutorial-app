@@ -9,19 +9,24 @@ const SAMPLE_PROMPTS = [
   "Close up of a premium smartphone camera lens reflecting a vibrant neon city street at night"
 ];
 
-export function GallerySection() {
+export function GallerySection({ apiKey }: { apiKey: string }) {
   const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateSamples = async () => {
+    if (!apiKey) {
+      setError("Please enter your Gemini API Key at the top of the page.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setImages([]);
     
     try {
       const results = await Promise.all(
-        SAMPLE_PROMPTS.map(prompt => generateImage(prompt))
+        SAMPLE_PROMPTS.map(prompt => generateImage(prompt, apiKey))
       );
       setImages(results);
     } catch (err: any) {
